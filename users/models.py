@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import RegexValidator
 
 
 # Create your models here.
@@ -8,15 +9,14 @@ class User(AbstractUser):
         ("male", "Male"),
         ("female", "Female"),
     }
-    # user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
-    # first_name = models.CharField(max_length=30)
-    # last_name = models.CharField(max_length=30)
+    phone_regex = RegexValidator(regex=r'^\\d{10}$', message="Phone number must be entered in the format: '9999999999'.")
+
     email = models.EmailField(unique=True)
-    mobile = models.CharField(max_length=10, blank=True)
-    gender = models.CharField(max_length=6, choices=gender_choices, blank=True, null=True)
+    mobile = models.CharField(max_length=10, validators=[phone_regex], blank=True, null=True)
+    gender = models.CharField(max_length=6, choices=gender_choices)
     dob = models.DateField(blank=True, null=True)
     img = models.ImageField(null=True, blank=True)
-    location = models.CharField(max_length=150, blank=True)
+    location = models.CharField(max_length=150)
 
     @property
     def imageURL(self):
