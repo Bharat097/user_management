@@ -31,7 +31,7 @@
                 <td>{{user.email}}</td>
                 <td>{{user.mobile}}</td>
                 <td>{{user.gender}}</td>
-                <td>{{user.dob}}</td>
+                <td>{{user.dob | date:'d M Y'}}</td>
                 <td>{{user.location}}</td>
                 <td><a href="{% url 'edit_user' user.id %}">Edit</a></td>
             </tr>

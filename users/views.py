@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from .forms import CreateUserForm, EditUserForm
 from .models import *
@@ -13,13 +14,14 @@ def register(request):
         form = CreateUserForm(request.POST, request.FILES)
 
         if form.is_valid():
-            print("yes valid")
-            # print(request.FILES)
             form.save()
             user = form.cleaned_data.get('username')
             messages.success(request, 'Account was created for ' + user)
 
-            return redirect('list_users')
+            return JsonResponse({'error': False, 'message': 'User Added Successfully'})
+        else:
+            return JsonResponse({'error': True, 'errors': form.errors})
+
 
     context = {'form': form, 'edit': False}
     return render(request, 'users/add_edit_user.html', context=context)
@@ -61,14 +63,16 @@ def edit_user(request, user_id):
 
     if request.method == 'POST':
         form = EditUserForm(request.POST, request.FILES, instance=user)
-
         if form.is_valid():
 
             form.save()
-            user_name = form.cleaned_data.get('username')
+            user_name = user.username
             messages.success(request, 'Updated Details for User: ' + user_name)
 
-            return redirect('list_users')
+            return JsonResponse({'error': False, 'message': 'Updated Successfully'})
+        else:
+            print(form.errors)
+            return JsonResponse({'error': True, 'errors': form.errors})
 
     form = EditUserForm(instance=user)
     context = {'form': form, 'edit': True}
