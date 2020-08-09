@@ -2,16 +2,22 @@
 {% block content_body %}
 
 <div class="container">
-    {{ form.errors }}
+    <!-- {{ form.errors }} -->
+    <div id="id_error"></div>
 
-    <form method="POST" action="" enctype="multipart/form-data">
+    <form id="my_form" method="POST" action="" enctype="multipart/form-data">
         {% csrf_token %}
+
+        {% if not edit %}
+
         <div class="form-group row">
             <label for="id_username" class="col-sm-2 col-form-label">User Name</label>
             <div class="col-sm-6">
                 {{ form.username }}
             </div>
         </div>
+
+        {% endif %}
 
         <div class="form-group row">
             <label for="id_first_name" class="col-sm-2 col-form-label">First Name</label>
@@ -92,23 +98,16 @@
             <div class="col-sm-8 text-center">
             {% if edit %}
             
-                <button type="submit" class="btn btn-primary col-sm-2">Update</button>
+                <a id="id_update_user" class="btn btn-primary col-sm-2 add_edit_user" style="color: #fff;"> Update </a>
 
             {% else %}
 
-                <button type="submit" class="btn btn-primary col-sm-2">Add</button>
+                <a id="id_add_user" class="btn btn-primary col-sm-2 add_edit_user" style="color: #fff;"> Add </a>
 
             {% endif %}
-                <a class="btn btn-danger col-sm-2" href="{% url 'list_users' %}"> Cancel </a>
+                <a class="btn btn-primary col-sm-2" href="{% url 'list_users' %}"> Cancel </a>
             </div>
         </div>
-
-        <!-- <div class="form-group row">
-            <label for="id_test" class="col-sm-2 col-form-label">Test</label>
-            <div class="col-sm-6">
-              <input type="text" class="form-control" id="id_test">
-            </div>
-        </div> -->
     </form>
 
   </div>
@@ -129,34 +128,42 @@
         $("#id_img").removeClass("form-control")
         $("#img-clear_id").removeClass("form-control")
 
-        //$("#id_test").datetimepicker({
-        //    datepicker: true,
-        //    timepicker: false,
-        //    yearStart: 1950,
-        //    yearEnd: 2020,
-        //
-        //});
-
-        //$('#id_dob').datetimepicker({
-        //    format:'YYYY-MM-DD HH:mm:ss'
-        //});
-
         var autocomplete;
-
-        //function initAutocomplete() {
-        // Create the autocomplete object, restricting the search predictions to
-        // geographical location types.
         autocomplete = new google.maps.places.Autocomplete(
             document.getElementById('id_location'), {types: ['geocode']});
-        
-        // Avoid paying for data that you don't need by restricting the set of
-        // place fields that are returned to just the address components.
         autocomplete.setFields(['address_component']);
-        
-        // When the user selects an address from the drop-down, populate the
-        // address fields in the form.
-        //}
+
+        $(".add_edit_user").on("click", function(e) {
+            e.preventDefault()
+            el = document.getElementById("my_form")
+            let url = "{{ request.path }}"
+            var formData = new FormData(document.getElementById("my_form"));
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    $('.error').remove();
+                    if(response.error){
+                        $.each(response.errors, function(name, error){
+                            error = '<small class="text-muted error">' + error + '</small>'
+                            $(el).find('[name=' + name + ']').after(error);
+                        })
+                    }
+                    else{
+                        window.location = "/"
+                    }
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+            
+
+        })
+
     });
+
 </script>
         
 {% endblock %}

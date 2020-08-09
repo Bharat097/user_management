@@ -9,7 +9,7 @@ class User(AbstractUser):
         ("male", "Male"),
         ("female", "Female"),
     }
-    phone_regex = RegexValidator(regex=r'^\\d{10}$', message="Phone number must be entered in the format: '9999999999'.")
+    phone_regex = RegexValidator(regex=r'^\d{10}$', message="Phone number must be entered in the format: '9999999999'.")
 
     email = models.EmailField(unique=True)
     mobile = models.CharField(max_length=10, validators=[phone_regex], blank=True, null=True)
